@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- ─── META & SEO ─────────────────────────────────────────── -->
+  <!-- charset: tells the browser to use UTF-8 encoding (supports all characters) -->
+  <meta charset="UTF-8" />
+  <!-- viewport: makes the page scale correctly on mobile devices -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- SEO: title shown in browser tab and Google search results -->
+  <title>AI Job Description Analyzer | Powered by Gemini</title>
+
+  <!-- SEO: description shown in Google search snippets -->
+  <meta name="description"
+    content="Paste a job description and your skills to instantly identify skill gaps and get personalized AI-powered learning recommendations using Google Gemini." />
+
+  <!-- ─── GOOGLE FONTS ──────────────────────────────────────── -->
+  <!-- We load two font weights of "Inter" — a clean, modern sans-serif used by many top tech products -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+
+  <!-- ─── STYLESHEET ────────────────────────────────────────── -->
+  <!-- Links to our style.css file inside the same public/ folder -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <!-- ─── PAGE WRAPPER ─────────────────────────────────────── -->
+  <!-- A single container that centers everything on the page -->
+  <div id="page-wrapper">
+
+    <!-- ─── HEADER ───────────────────────────────────────────── -->
+    <header id="app-header">
+      <!-- The animated gradient badge above the title -->
+      <div id="header-badge">
+        <span class="badge-dot"></span>
+        Powered by Google Gemini
+      </div>
+
+      <!-- h1: the most important heading on the page (one per page for SEO) -->
+      <h1 id="app-title">AI Job Description Analyzer</h1>
+
+      <!-- Subtitle / description -->
+      <p id="app-subtitle">
+        Paste a job description, enter your skills, and let Gemini identify
+        your skill gaps and recommend exactly what to learn next.
+      </p>
+    </header>
+
+    <!-- ─── MAIN CONTENT ──────────────────────────────────────── -->
+    <main id="main-content">
+
+      <!-- ─── INPUT SECTION ────────────────────────────────────── -->
+      <!-- This card holds both input fields and the analyze button -->
+      <section id="input-section" aria-label="Job analysis inputs">
+
+        <!-- ── Job Description Input ── -->
+        <div class="input-group" id="jd-group">
+          <!-- <label> is linked to the textarea via the "for" attribute matching the textarea's "id" -->
+          <!-- This improves accessibility: clicking the label focuses the textarea -->
+          <label for="job-description" class="input-label">
+            <span class="label-icon">📋</span>
+            Job Description
+          </label>
+          <textarea
+            id="job-description"
+            name="jobDescription"
+            class="input-field"
+            placeholder="Paste the full job description here…
+&#10;Example: We are looking for a React developer with experience in Node.js, REST APIs, and SQL databases..."
+            rows="10"
+            aria-required="true"
+            aria-describedby="jd-hint"
+          ></textarea>
+          <!-- Character count hint shown below the textarea -->
+          <p class="input-hint" id="jd-hint">
+            Paste the complete job posting for the most accurate analysis.
+          </p>
+        </div>
+
+        <!-- ── User Skills Input ── -->
+        <div class="input-group" id="skills-group">
+          <label for="user-skills" class="input-label">
+            <span class="label-icon">🛠️</span>
+            Your Technical Skills
+          </label>
+          <textarea
+            id="user-skills"
+            name="userSkills"
+            class="input-field"
+            placeholder="List your skills separated by commas…
+&#10;Example: HTML, CSS, JavaScript, React, Git, Python, SQL"
+            rows="4"
+            aria-required="true"
+            aria-describedby="skills-hint"
+          ></textarea>
+          <p class="input-hint" id="skills-hint">
+            Separate skills with commas. Be specific — e.g. "React" not just "frontend".
+          </p>
+        </div>
+
+        <!-- ── Analyze Button ── -->
+        <!-- id="analyze-btn" is used by script.js to attach a click listener -->
+        <button id="analyze-btn" type="button" aria-label="Analyze job description">
+          <!-- The default state: icon + text -->
+          <span id="btn-default-content">
+            <span class="btn-icon">✨</span>
+            Analyze with Gemini
+          </span>
+          <!-- The loading state: shown while waiting for the API (hidden by default) -->
+          <!-- btn-loading-text is updated by setLoadingText() in script.js during retries -->
+          <span id="btn-loading-content" hidden>
+            <span class="spinner" aria-hidden="true"></span>
+            <span id="btn-loading-text">Analyzing…</span>
+          </span>
+        </button>
+
+      </section>
+
+      <!-- ─── ERROR BANNER ──────────────────────────────────────── -->
+      <!-- Hidden by default (display:none via CSS). script.js shows/hides this. -->
+      <div id="error-banner" role="alert" aria-live="polite" hidden>
+        <span class="error-icon">⚠️</span>
+        <!-- textContent is set by showError() in script.js before the banner is shown -->
+        <p id="error-message"></p>
+      </div>
+
+      <!-- ─── RESULTS SECTION ───────────────────────────────────── -->
+      <!-- Hidden until the API returns data. script.js will unhide this. -->
+      <section id="results-section" hidden aria-label="Analysis results">
+
+        <!-- ── Results Header ── -->
+        <div id="results-header">
+          <h2 id="results-title">Analysis Complete</h2>
+          <p id="results-subtitle">Here's how your skills match this role.</p>
+        </div>
+
+        <!-- ── Skills Summary Grid ── -->
+        <!-- Three stat cards: Required / Matched / Missing counts -->
+        <div id="stats-grid">
+
+          <div class="stat-card" id="stat-required">
+            <span class="stat-number" id="count-required">0</span>
+            <span class="stat-label">Required Skills</span>
+          </div>
+
+          <div class="stat-card" id="stat-matched">
+            <span class="stat-number" id="count-matched">0</span>
+            <span class="stat-label">Skills You Have</span>
+          </div>
+
+          <div class="stat-card" id="stat-missing">
+            <span class="stat-number" id="count-missing">0</span>
+            <span class="stat-label">Skills to Learn</span>
+          </div>
+
+        </div>
+
+        <!-- ── All Required Skills (combined chip list) ── -->
+        <div class="skills-block" id="required-skills-block">
+          <h3 class="block-title">
+            <span class="block-icon">🎯</span>
+            All Required Skills
+          </h3>
+          <!-- script.js will inject skill chips here -->
+          <div class="chips-container" id="required-skills-list"></div>
+        </div>
+
+        <!-- ── Skills Breakdown: Matched + Missing side by side ── -->
+        <div id="skills-breakdown">
+
+          <!-- Matched Skills -->
+          <div class="skills-block matched-block">
+            <h3 class="block-title">
+              <span class="block-icon">✅</span>
+              Skills You Have
+            </h3>
+            <!-- Chips will be injected here by script.js -->
+            <div class="chips-container" id="matched-skills-list"></div>
+          </div>
+
+          <!-- Missing Skills -->
+          <div class="skills-block missing-block">
+            <h3 class="block-title">
+              <span class="block-icon">📌</span>
+              Skills to Learn
+            </h3>
+            <!-- Chips will be injected here by script.js -->
+            <div class="chips-container" id="missing-skills-list"></div>
+          </div>
+
+        </div>
+
+        <!-- ── Learning Recommendations ── -->
+        <div id="recommendations-section">
+          <h3 class="block-title" id="rec-title">
+            <span class="block-icon">📚</span>
+            Learning Recommendations
+          </h3>
+          <p class="block-subtitle">
+            Personalized resources to close your skill gaps, curated by Gemini.
+          </p>
+          <!-- Recommendation cards will be injected here by script.js -->
+          <div id="recommendations-list"></div>
+        </div>
+
+        <!-- ── Analyze Again Button ── -->
+        <div id="reset-wrapper">
+          <button id="reset-btn" type="button" aria-label="Start a new analysis">
+            ↩ Analyze Another Job
+          </button>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- ─── FOOTER ────────────────────────────────────────────── -->
+    <footer id="app-footer">
+      <p>Built with <span class="heart">♥</span> using Node.js, Express &amp; Google Gemini API</p>
+    </footer>
+
+  </div><!-- /#page-wrapper -->
+
+  <!-- ─── JAVASCRIPT ────────────────────────────────────────── -->
+  <!-- Placed at the bottom of <body> so all HTML elements above exist before the JS runs -->
+  <!-- "defer" is redundant here (already at the bottom), but good practice for clarity -->
+  <script src="script.js"></script>
+
+</body>
+</html>

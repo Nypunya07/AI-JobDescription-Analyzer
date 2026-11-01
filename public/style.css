@@ -1,0 +1,853 @@
+/* ================================================================
+   style.css — Premium Dark Theme for AI Job Description Analyzer
+   ================================================================
+   Reading guide:
+   1. CSS Variables (Design Tokens)  → lines ~20–60
+   2. Reset & Base                   → lines ~65–100
+   3. Layout                         → lines ~105–140
+   4. Header                         → lines ~145–220
+   5. Input Section                  → lines ~225–370
+   6. Analyze Button                 → lines ~375–440
+   7. Error Banner                   → lines ~445–480
+   8. Results Section                → lines ~485–530
+   9. Stats Grid                     → lines ~535–610
+   10. Skills Blocks & Chips         → lines ~615–740
+   11. Recommendations               → lines ~745–840
+   12. Reset Button & Footer         → lines ~845–900
+   13. Animations (@keyframes)       → lines ~905–960
+   14. Responsive (Mobile)           → lines ~965+
+================================================================ */
+
+
+/* ── 1. CSS CUSTOM PROPERTIES (Design Tokens) ─────────────────
+   Custom properties (CSS variables) let us define our color palette
+   and spacing once, then reuse everywhere. Changing one value here
+   updates the entire design.
+   Usage: var(--color-bg)
+──────────────────────────────────────────────────────────────── */
+:root {
+  /* Backgrounds — layered dark surfaces */
+  --color-bg:           #080b14;   /* page background — deep navy-black */
+  --color-surface:      #0f1320;   /* card backgrounds */
+  --color-surface-2:    #161c2e;   /* elevated surface (input fields) */
+  --color-border:       rgba(99, 120, 255, 0.15);  /* subtle purple border */
+  --color-border-focus: rgba(99, 120, 255, 0.6);   /* brighter on focus */
+
+  /* Brand Colors */
+  --color-primary:      #6378ff;   /* primary purple-blue */
+  --color-primary-glow: rgba(99, 120, 255, 0.3);
+  --color-secondary:    #a78bfa;   /* lighter lavender accent */
+
+  /* Semantic Colors */
+  --color-success:      #10b981;   /* matched skills — emerald green */
+  --color-success-bg:   rgba(16, 185, 129, 0.12);
+  --color-success-border: rgba(16, 185, 129, 0.3);
+
+  --color-danger:       #f43f5e;   /* missing skills — rose red */
+  --color-danger-bg:    rgba(244, 63, 94, 0.12);
+  --color-danger-border: rgba(244, 63, 94, 0.3);
+
+  --color-warning:      #f59e0b;   /* stat card accent */
+  --color-warning-bg:   rgba(245, 158, 11, 0.12);
+
+  --color-info:         #38bdf8;   /* required skills — sky blue */
+  --color-info-bg:      rgba(56, 189, 248, 0.12);
+  --color-info-border:  rgba(56, 189, 248, 0.3);
+
+  /* Text Colors */
+  --color-text-primary:   #e8eaf6;  /* headings and important text */
+  --color-text-secondary: #8892b0;  /* labels, hints, subtitles */
+  --color-text-muted:     #4a5568;  /* placeholder text */
+
+  /* Gradients */
+  --gradient-brand: linear-gradient(135deg, #6378ff 0%, #a78bfa 50%, #38bdf8 100%);
+  --gradient-btn:   linear-gradient(135deg, #6378ff 0%, #8b5cf6 100%);
+  --gradient-glow:  linear-gradient(135deg, rgba(99,120,255,0.4), rgba(167,139,250,0.4));
+
+  /* Spacing */
+  --space-xs:   0.375rem;   /* 6px */
+  --space-sm:   0.75rem;    /* 12px */
+  --space-md:   1.25rem;    /* 20px */
+  --space-lg:   2rem;       /* 32px */
+  --space-xl:   3rem;       /* 48px */
+
+  /* Typography */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-size-sm:   0.875rem;   /* 14px */
+  --font-size-base: 1rem;       /* 16px */
+  --font-size-lg:   1.125rem;   /* 18px */
+  --font-size-xl:   1.375rem;   /* 22px */
+  --font-size-2xl:  1.75rem;    /* 28px */
+  --font-size-3xl:  2.5rem;     /* 40px */
+
+  /* Borders & Radius */
+  --radius-sm:   8px;
+  --radius-md:   14px;
+  --radius-lg:   20px;
+  --radius-xl:   28px;
+  --radius-pill: 100px;
+
+  /* Shadows */
+  --shadow-sm:  0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md:  0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 40px rgba(99, 120, 255, 0.2);
+
+  /* Transitions */
+  --transition-fast:   150ms ease;
+  --transition-base:   250ms ease;
+  --transition-slow:   400ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+
+/* ── 2. RESET & BASE STYLES ───────────────────────────────────
+   A CSS reset removes browser default styling inconsistencies
+   so we start from a clean, predictable baseline.
+──────────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;  /* padding/border included in width — prevents overflow surprises */
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;  /* smooth scroll when jumping to sections */
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+
+  /* Subtle animated background mesh */
+  background-image:
+    radial-gradient(ellipse at 20% 20%, rgba(99, 120, 255, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 80%, rgba(167, 139, 250, 0.05) 0%, transparent 60%);
+  background-attachment: fixed;
+
+  /* Improve text rendering on all platforms */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+/* ── 3. LAYOUT ────────────────────────────────────────────────
+   The page wrapper centers all content with a max-width.
+──────────────────────────────────────────────────────────────── */
+#page-wrapper {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: var(--space-lg) var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+
+/* ── 4. HEADER ────────────────────────────────────────────────
+──────────────────────────────────────────────────────────────── */
+#app-header {
+  text-align: center;
+  padding: var(--space-xl) 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  animation: fadeSlideDown 0.6s var(--transition-slow) both;
+}
+
+/* The "Powered by Gemini" badge above the title */
+#header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 6px 16px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border-focus);
+  background: rgba(99, 120, 255, 0.08);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-secondary);
+  letter-spacing: 0.02em;
+}
+
+/* The pulsing green dot in the badge */
+.badge-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-success);
+  box-shadow: 0 0 8px var(--color-success);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Main app title with gradient text */
+#app-title {
+  font-size: clamp(var(--font-size-2xl), 5vw, var(--font-size-3xl));
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+
+  /* Gradient text — applies gradient as background then clips to text shape */
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+#app-subtitle {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+  max-width: 580px;
+  line-height: 1.7;
+}
+
+
+/* ── 5. INPUT SECTION ─────────────────────────────────────────
+   The card that holds both textareas and the button.
+──────────────────────────────────────────────────────────────── */
+#input-section {
+  /* Glassmorphism card: slightly transparent, blurred background */
+  background: rgba(15, 19, 32, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  box-shadow: var(--shadow-md), var(--shadow-glow);
+  animation: fadeSlideUp 0.7s var(--transition-slow) 0.1s both;
+}
+
+/* Wrapper for each label + textarea + hint group */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+/* Labels above each input */
+.input-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.label-icon {
+  font-size: 1rem;
+}
+
+/* Both textareas share this class */
+.input-field {
+  width: 100%;
+  padding: var(--space-md);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  line-height: 1.7;
+  resize: vertical;      /* user can drag to resize vertically only */
+  outline: none;
+  transition: border-color var(--transition-base), box-shadow var(--transition-base),
+              background var(--transition-base);
+}
+
+.input-field:hover {
+  border-color: rgba(99, 120, 255, 0.3);
+  background: rgba(22, 28, 46, 0.9);
+}
+
+/* Focus ring — the glowing border when user clicks inside the field */
+.input-field:focus {
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 3px rgba(99, 120, 255, 0.15), var(--shadow-sm);
+  background: rgba(22, 28, 46, 0.95);
+}
+
+/* Placeholder text style */
+.input-field::placeholder {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+}
+
+/* Hint text beneath each input */
+.input-hint {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  padding-left: 2px;
+}
+
+
+/* ── 6. ANALYZE BUTTON ────────────────────────────────────────
+──────────────────────────────────────────────────────────────── */
+#analyze-btn {
+  width: 100%;
+  padding: 18px var(--space-lg);
+  border: none;
+  border-radius: var(--radius-lg);
+  background: var(--gradient-btn);
+  color: #fff;
+  font-family: var(--font-family);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+
+  /* Layered shadows: depth + glow */
+  box-shadow: 0 4px 20px rgba(99, 120, 255, 0.4), 0 1px 3px rgba(0,0,0,0.3);
+
+  transition: transform var(--transition-base), box-shadow var(--transition-base),
+              filter var(--transition-base);
+
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle shimmer overlay on hover */
+#analyze-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+#analyze-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(99, 120, 255, 0.55), 0 2px 6px rgba(0,0,0,0.3);
+  filter: brightness(1.08);
+}
+
+#analyze-btn:hover:not(:disabled)::after {
+  opacity: 1;
+}
+
+#analyze-btn:active:not(:disabled) {
+  transform: translateY(0px);
+  box-shadow: 0 2px 12px rgba(99, 120, 255, 0.3);
+}
+
+/* Disabled state while loading */
+#analyze-btn:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+.btn-icon {
+  font-size: 1.2rem;
+}
+
+/* Loading spinner — pure CSS animated circle */
+.spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2.5px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+
+/* ── 7. ERROR BANNER ──────────────────────────────────────────
+   Shown when validation fails or the API returns an error.
+   The [hidden] attribute sets display:none via the browser UA sheet.
+   We must NOT override it with display:flex on the base rule —
+   instead default to none and only switch to flex when visible.
+──────────────────────────────────────────────────────────────── */
+#error-banner {
+  /* display:none by default — respects the [hidden] attribute */
+  display: none;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  background: rgba(244, 63, 94, 0.1);
+  border: 1px solid var(--color-danger-border);
+  border-left: 4px solid var(--color-danger);
+  border-radius: var(--radius-md);
+  animation: fadeSlideUp 0.3s var(--transition-slow) both;
+}
+
+/* When script.js removes [hidden], switch to flex layout */
+#error-banner:not([hidden]) {
+  display: flex;
+}
+
+.error-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+#error-message {
+  color: #fda4af;   /* soft rose — readable on dark background */
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+
+/* ── 8. RESULTS SECTION ───────────────────────────────────────
+   Hidden by default — revealed by script.js after successful API call.
+   IMPORTANT: Do NOT add display:flex to the base rule — it would
+   override the browser UA sheet's [hidden]{display:none} and make
+   the section visible on page load before any analysis runs.
+──────────────────────────────────────────────────────────────── */
+#results-section {
+  /* No display property here — let [hidden] do its job */
+  flex-direction: column;
+  gap: var(--space-xl);
+  animation: fadeSlideUp 0.6s var(--transition-slow) both;
+}
+
+/* Explicit [hidden] guard — author rule beats UA rule, so we
+   must declare display:none ourselves to guarantee it wins */
+#results-section[hidden] {
+  display: none;
+}
+
+/* Switch to flex layout only when script.js removes [hidden] */
+#results-section:not([hidden]) {
+  display: flex;
+}
+
+#results-header {
+  text-align: center;
+}
+
+#results-title {
+  font-size: var(--font-size-2xl);
+  font-weight: 800;
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: var(--space-xs);
+}
+
+#results-subtitle {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-lg);
+}
+
+
+/* ── 9. STATS GRID ────────────────────────────────────────────
+   Three cards showing: Required / Matched / Missing counts.
+──────────────────────────────────────────────────────────────── */
+#stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+}
+
+.stat-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg) var(--space-md);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  transition: transform var(--transition-base), border-color var(--transition-base);
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+}
+
+.stat-number {
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.stat-label {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Individual stat card accent colors */
+#stat-required {
+  border-top: 3px solid var(--color-info);
+}
+#stat-required .stat-number {
+  color: var(--color-info);
+}
+
+#stat-matched {
+  border-top: 3px solid var(--color-success);
+}
+#stat-matched .stat-number {
+  color: var(--color-success);
+}
+
+#stat-missing {
+  border-top: 3px solid var(--color-danger);
+}
+#stat-missing .stat-number {
+  color: var(--color-danger);
+}
+
+
+/* ── 10. SKILLS BLOCKS & CHIPS ────────────────────────────────
+──────────────────────────────────────────────────────────────── */
+
+/* A "skills block" is a titled section containing a group of chips */
+.skills-block {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* Section heading inside each skills block */
+.block-title {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.block-icon {
+  font-size: 1.2rem;
+}
+
+.block-subtitle {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base);
+  margin-top: calc(-1 * var(--space-xs));
+}
+
+/* The container that wraps all chips — uses flex-wrap to flow naturally */
+.chips-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+/* A "chip" is a pill-shaped tag for each skill */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  border: 1px solid transparent;
+  animation: chipPop 0.3s var(--transition-slow) both;
+  cursor: default;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.chip:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Matched skill chip — green */
+.chip.matched {
+  background: var(--color-success-bg);
+  border-color: var(--color-success-border);
+  color: #6ee7b7;  /* lighter green for readability on dark */
+}
+
+/* Missing skill chip — red/rose */
+.chip.missing {
+  background: var(--color-danger-bg);
+  border-color: var(--color-danger-border);
+  color: #fda4af;
+}
+
+/* Required skills chip — blue */
+.chip.required {
+  background: var(--color-info-bg);
+  border-color: var(--color-info-border);
+  color: #7dd3fc;
+}
+
+/* Matched + missing side by side layout */
+#skills-breakdown {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+.matched-block {
+  border-top: 3px solid var(--color-success);
+}
+
+.missing-block {
+  border-top: 3px solid var(--color-danger);
+}
+
+
+/* ── 11. RECOMMENDATIONS ──────────────────────────────────────
+   One card per missing skill with reason + resource.
+──────────────────────────────────────────────────────────────── */
+#recommendations-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+#rec-title {
+  font-size: var(--font-size-xl);
+  margin-bottom: var(--space-xs);
+}
+
+/* The grid that holds all recommendation cards */
+#recommendations-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+}
+
+/* A single recommendation card */
+.rec-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  animation: fadeSlideUp 0.4s var(--transition-slow) both;
+  transition: transform var(--transition-base), border-color var(--transition-base),
+              box-shadow var(--transition-base);
+}
+
+.rec-card:hover {
+  transform: translateX(4px);
+  border-left-color: var(--color-secondary);
+  box-shadow: var(--shadow-md);
+}
+
+/* Skill name badge at the top of the card */
+.rec-skill-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  background: rgba(99, 120, 255, 0.15);
+  border: 1px solid rgba(99, 120, 255, 0.3);
+  color: var(--color-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  align-self: flex-start;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+/* Why this skill matters — the "reason" text */
+.rec-reason {
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  line-height: 1.7;
+}
+
+/* Learning resource section inside the card */
+.rec-resource-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: rgba(56, 189, 248, 0.07);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: var(--radius-sm);
+  margin-top: var(--space-xs);
+}
+
+.rec-resource-label {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-info);
+  white-space: nowrap;
+}
+
+.rec-resource-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+
+/* ── 12. RESET BUTTON & FOOTER ────────────────────────────────
+──────────────────────────────────────────────────────────────── */
+#reset-wrapper {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--space-sm);
+}
+
+#reset-btn {
+  padding: 12px 32px;
+  background: transparent;
+  border: 1px solid var(--color-border-focus);
+  border-radius: var(--radius-pill);
+  color: var(--color-secondary);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition-base), transform var(--transition-base),
+              box-shadow var(--transition-base);
+}
+
+#reset-btn:hover {
+  background: rgba(99, 120, 255, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(99, 120, 255, 0.2);
+}
+
+/* Footer */
+#app-footer {
+  text-align: center;
+  padding: var(--space-md) 0 var(--space-lg);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  border-top: 1px solid var(--color-border);
+}
+
+.heart {
+  color: var(--color-danger);
+  animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+
+/* ── 13. ANIMATIONS (@keyframes) ──────────────────────────────
+   @keyframes define reusable animation sequences.
+   They're applied via the `animation` property.
+──────────────────────────────────────────────────────────────── */
+
+/* Fade in + slide down from above (used by header) */
+@keyframes fadeSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fade in + slide up from below (used by cards, results) */
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Loading spinner rotation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Pulsing dot in the header badge */
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 6px var(--color-success);
+    opacity: 1;
+  }
+  50% {
+    box-shadow: 0 0 14px var(--color-success);
+    opacity: 0.7;
+  }
+}
+
+/* Skill chip pop-in effect */
+@keyframes chipPop {
+  from {
+    opacity: 0;
+    transform: scale(0.75);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Heart pulse in footer */
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.25); }
+}
+
+
+/* ── 14. RESPONSIVE — MOBILE ──────────────────────────────────
+   @media queries apply styles only when the screen is ≤ X wide.
+   This makes the layout stack vertically on small screens.
+──────────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+
+  #page-wrapper {
+    padding: var(--space-md) var(--space-sm);
+    gap: var(--space-lg);
+  }
+
+  #input-section {
+    padding: var(--space-md);
+    border-radius: var(--radius-lg);
+  }
+
+  /* Stack stat cards vertically on mobile */
+  #stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Stack matched/missing blocks vertically on mobile */
+  #skills-breakdown {
+    grid-template-columns: 1fr;
+  }
+
+  #analyze-btn {
+    font-size: var(--font-size-base);
+    padding: 16px;
+  }
+
+  .stat-number {
+    font-size: 2.25rem;
+  }
+}

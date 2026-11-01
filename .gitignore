@@ -1,0 +1,5 @@
+# Node.js dependencies — reinstallable with npm install
+node_modules/
+
+# Environment variables — contains secret API key, never commit this
+.env
